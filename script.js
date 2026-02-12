@@ -95,25 +95,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== 3. ПЛАВНАЯ ПРОКРУТКА ДЛЯ ЯКОРЕЙ ==========
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                const headerHeight = document.querySelector('.header').offsetHeight;
-                const targetPosition = targetElement.offsetTop - headerHeight - 20;
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-            }
+    // ========== 3. ПЛАВНАЯ ПРОКРУТКА К ЯКОРЯМ (С УЧЁТОМ ШАПКИ) ==========
+    function smoothScroll() {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#' || !targetId) return;
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    const headerHeight = document.querySelector('.header').offsetHeight;
+                    const targetPosition = targetElement.offsetTop - headerHeight - 20;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
         });
-    });
+    }
+    smoothScroll();
 
-    // ========== 4. УЛУЧШЕННОЕ МОБИЛЬНОЕ МЕНЮ (С ОВЕРЛЕЕМ) ==========
+    // ========== 4. МОБИЛЬНОЕ МЕНЮ С ОВЕРЛЕЕМ ==========
     const mobileBtn = document.querySelector('.mobile-menu-btn');
     const nav = document.querySelector('.nav-links');
 
@@ -198,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ========== 5. АНИМАЦИЯ ПРИ ПРОКРУТКЕ ==========
-    const animatedElements = document.querySelectorAll('.service-card, .feature, .stat-item, .benefit');
+    const animatedElements = document.querySelectorAll('.service-card, .feature, .stat-item, .benefit, .team-card, .blog-card, .case-card');
     animatedElements.forEach(element => {
         element.style.opacity = '0';
         element.style.transform = 'translateY(30px)';
@@ -219,13 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', animateOnScroll);
     animateOnScroll();
 
-    // ========== 6. ОБНОВЛЕНИЕ ГОДА В ФУТЕРЕ ==========
-    const yearElement = document.querySelector('.footer-legal span:first-child');
-    if (yearElement) {
-        yearElement.textContent = '© 2023–2026 ООО «АКАЛАН». Все права защищены.';
-    }
-
-    // ========== 7. ИНТЕРАКТИВНЫЕ КАРТОЧКИ УСЛУГ ==========
+    // ========== 6. ИНТЕРАКТИВНЫЕ КАРТОЧКИ УСЛУГ ==========
     document.querySelectorAll('.service-card').forEach(card => {
         card.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-10px) scale(1.02)';
@@ -235,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ========== 8. ПОИСК ПО САЙТУ ==========
+    // ========== 7. ПОИСК ПО САЙТУ ==========
     const searchToggle = document.getElementById('searchToggle');
     if (searchToggle) {
         const searchPanel = document.createElement('div');
@@ -389,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== 9. КНОПКА «НАВЕРХ» ==========
+    // ========== 8. КНОПКА «НАВЕРХ» ==========
     const scrollTopBtn = document.createElement('button');
     scrollTopBtn.className = 'scroll-top';
     scrollTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
@@ -410,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ========== 10. COOKIE CONSENT ==========
+    // ========== 9. COOKIE CONSENT ==========
     const cookieConsent = document.getElementById('cookieConsent');
     const acceptBtn = document.getElementById('acceptCookies');
 
@@ -425,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== 11. ПОДЕЛИТЬСЯ В СОЦСЕТЯХ ==========
+    // ========== 10. ПОДЕЛИТЬСЯ В СОЦСЕТЯХ ==========
     function initShareButtons() {
         const shareBtns = document.querySelectorAll('.share-btn');
         const pageUrl = encodeURIComponent(window.location.href);
@@ -458,49 +455,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     initShareButtons();
 
-    // ========== 12. КАЛЬКУЛЯТОР СТОИМОСТИ ==========
-    function initCalculator() {
-        const serviceRadios = document.querySelectorAll('input[name="service"]');
-        const complexitySlider = document.getElementById('complexity');
-        const urgencySelect = document.getElementById('urgency');
-        const resultPriceSpan = document.getElementById('resultPrice');
-
-        if (!serviceRadios.length || !complexitySlider || !urgencySelect || !resultPriceSpan) return;
-
-        const basePrices = {
-            consulting: 50000,
-            management: 75000,
-            analytics: 35000,
-            partnership: 40000
-        };
-
-        function calculatePrice() {
-            let selectedService = 'consulting';
-            serviceRadios.forEach(radio => {
-                if (radio.checked) selectedService = radio.value;
-            });
-            const base = basePrices[selectedService] || 50000;
-
-            const complexity = parseInt(complexitySlider.value) || 3;
-            const complexityMultiplier = 0.8 + (complexity - 1) * 0.2;
-
-            const urgencyMultiplier = parseFloat(urgencySelect.value) || 1;
-
-            let total = base * complexityMultiplier * urgencyMultiplier;
-            total = Math.round(total / 1000) * 1000;
-
-            resultPriceSpan.textContent = total.toLocaleString('ru-RU') + ' ₽';
-        }
-
-        serviceRadios.forEach(radio => radio.addEventListener('change', calculatePrice));
-        complexitySlider.addEventListener('input', calculatePrice);
-        urgencySelect.addEventListener('change', calculatePrice);
-
-        calculatePrice();
-    }
-    initCalculator();
-
-    // ========== 13. ХЛЕБНЫЕ КРОШКИ ==========
+    // ========== 11. ХЛЕБНЫЕ КРОШКИ ==========
     function initBreadcrumbs() {
         const breadcrumbList = document.getElementById('breadcrumbList');
         if (!breadcrumbList) return;
@@ -512,10 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'career': 'Карьера',
             'team': 'Команда',
             'cases': 'Кейсы',
-            'calculator': 'Калькулятор',
             'blog': 'Новости',
-            'testimonials': 'Отзывы',
-            'partners': 'Партнёры',
             'faq': 'Вопросы',
             'footer': 'Контакты'
         };
@@ -544,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     initBreadcrumbs();
 
-    // ========== 14. ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА (ЗАГЛУШКА) ==========
+    // ========== 12. ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА (EN) ==========
     const enLangBtn = document.getElementById('enLangBtn');
     if (enLangBtn) {
         enLangBtn.addEventListener('click', function() {
@@ -579,12 +531,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== 15. ФИЛЬТРАЦИЯ УСЛУГ ==========
+    // ========== 13. ФИЛЬТРАЦИЯ УСЛУГ ==========
     const filterButtons = document.querySelectorAll('.filter-btn');
     const serviceCards = document.querySelectorAll('.service-card');
 
     if (filterButtons.length && serviceCards.length) {
-        // Убедимся, что все карточки видимы при загрузке
         serviceCards.forEach(card => card.classList.remove('hidden'));
 
         filterButtons.forEach(btn => {
@@ -610,7 +561,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== 16. FAQ АККОРДЕОН ==========
+    // ========== 14. FAQ АККОРДЕОН ==========
     function initFaq() {
         const faqItems = document.querySelectorAll('.faq-item');
         if (!faqItems.length) return;
@@ -624,85 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     initFaq();
 
-    // ========== 17. СЛАЙДЕР ОТЗЫВОВ ==========
-    function initTestimonialsSlider() {
-        const sliderWrapper = document.querySelector('.slider-wrapper');
-        const slides = document.querySelectorAll('.testimonial-card');
-        const prevBtn = document.querySelector('.slider-arrow.prev');
-        const nextBtn = document.querySelector('.slider-arrow.next');
-        const dotsContainer = document.querySelector('.slider-dots');
-
-        if (!sliderWrapper || !slides.length) return;
-
-        let currentIndex = 0;
-        let slideInterval;
-
-        function createDots() {
-            dotsContainer.innerHTML = '';
-            slides.forEach((_, index) => {
-                const dot = document.createElement('button');
-                dot.classList.add('dot');
-                if (index === 0) dot.classList.add('active');
-                dot.addEventListener('click', () => goToSlide(index));
-                dotsContainer.appendChild(dot);
-            });
-        }
-
-        function goToSlide(index) {
-            if (index < 0) index = slides.length - 1;
-            if (index >= slides.length) index = 0;
-            
-            currentIndex = index;
-            const offset = -index * 100;
-            sliderWrapper.style.transform = `translateX(${offset}%)`;
-            
-            document.querySelectorAll('.dot').forEach((dot, i) => {
-                if (i === index) dot.classList.add('active');
-                else dot.classList.remove('active');
-            });
-        }
-
-        function nextSlide() {
-            goToSlide(currentIndex + 1);
-        }
-
-        function prevSlide() {
-            goToSlide(currentIndex - 1);
-        }
-
-        function startAutoPlay() {
-            stopAutoPlay();
-            slideInterval = setInterval(nextSlide, 5000);
-        }
-
-        function stopAutoPlay() {
-            if (slideInterval) clearInterval(slideInterval);
-        }
-
-        if (dotsContainer) createDots();
-        if (prevBtn) prevBtn.addEventListener('click', () => {
-            prevSlide();
-            stopAutoPlay();
-            startAutoPlay();
-        });
-        if (nextBtn) nextBtn.addEventListener('click', () => {
-            nextSlide();
-            stopAutoPlay();
-            startAutoPlay();
-        });
-
-        sliderWrapper.addEventListener('mouseenter', stopAutoPlay);
-        sliderWrapper.addEventListener('mouseleave', startAutoPlay);
-
-        startAutoPlay();
-
-        window.addEventListener('resize', () => {
-            goToSlide(currentIndex);
-        });
-    }
-    initTestimonialsSlider();
-
-    // ========== 18. ПРОГРЕСС-БАР ЧТЕНИЯ ==========
+    // ========== 15. ПРОГРЕСС-БАР ЧТЕНИЯ ==========
     function initProgressBar() {
         const progressBar = document.getElementById('progressBar');
         if (!progressBar) return;
@@ -719,5 +592,11 @@ document.addEventListener('DOMContentLoaded', function() {
         updateProgress();
     }
     initProgressBar();
+
+    // ========== 16. ОБНОВЛЕНИЕ ГОДА В ФУТЕРЕ ==========
+    const yearElement = document.querySelector('.footer-legal span:first-child');
+    if (yearElement) {
+        yearElement.textContent = '© 2023–2026 ООО «АКАЛАН». Все права защищены.';
+    }
 
 }); // Конец DOMContentLoaded
