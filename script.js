@@ -598,5 +598,45 @@ document.addEventListener('DOMContentLoaded', function() {
     if (yearElement) {
         yearElement.textContent = '© 2023–2026 ООО «АКАЛАН». Все права защищены.';
     }
-
+// ========== КНОПКА КОПИРОВАНИЯ EMAIL ==========
+function initCopyEmail() {
+    const copyBtn = document.getElementById('copyEmailBtn');
+    const emailLink = document.getElementById('emailLink');
+    
+    if (!copyBtn || !emailLink) return;
+    
+    // Создаём уведомление
+    const notification = document.createElement('div');
+    notification.className = 'copy-notification';
+    notification.textContent = 'Email скопирован!';
+    document.body.appendChild(notification);
+    
+    copyBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const email = emailLink.textContent.trim();
+        
+        try {
+            await navigator.clipboard.writeText(email);
+            
+            // Визуальный фидбек
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+            notification.classList.add('show');
+            
+            // Возвращаем исходный вид через 2 секунды
+            setTimeout(() => {
+                copyBtn.classList.remove('copied');
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                notification.classList.remove('show');
+            }, 2000);
+            
+        } catch (err) {
+            console.error('Ошибка копирования:', err);
+            alert('Не удалось скопировать email. Скопируйте вручную.');
+        }
+    });
+}
+initCopyEmail();
 }); // Конец DOMContentLoaded
